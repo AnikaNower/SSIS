@@ -1,0 +1,314 @@
+USE [galderma_midas_feed]
+GO
+/****** Object:  StoredProcedure [dbo].[GALDERMA_PROCESSING]    Script Date: 03/16/2012 01:15:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+
+ALTER PROCEDURE [dbo].[GALDERMA_PROCESSING]
+AS
+BEGIN
+	SET NOCOUNT ON;
+	if exists (select * from dbo.sysobjects where id = object_id(N'[M01_SUM]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+	drop table [M01_SUM]
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[M02_SUM]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+	drop table [M02_SUM]
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[M03_SUM]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+	drop table [M03_SUM]
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[M04_SUM]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+	drop table [M04_SUM]
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[M05_SUM]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+	drop table [M05_SUM]
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[M06_SUM]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+	drop table [M06_SUM]
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[M07_SUM]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+	drop table [M07_SUM]
+
+	if exists (select * from dbo.sysobjects where id = object_id(N'[GALDERMA_INTER]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+	drop table [GALDERMA_INTER]
+
+	SELECT     
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1 AS PERIOD, 
+			sum(cast(COLUMN_VALUE3 as float))as UN, 
+			sum(CAST(COLUMN_VALUE1 AS FLOAT))as SU,
+			sum(CAST(COLUMN_VALUE2 AS FLOAT))as CU
+	into	M01_sum
+	FROM	M01
+	group by 
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1
+
+
+	SELECT     
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1 AS PERIOD, 
+			sum(cast(COLUMN_VALUE1 as float))as [LCD/MNF], 
+			sum(CAST(COLUMN_VALUE2 AS FLOAT))as [USD/MNF],
+			sum(CAST(COLUMN_VALUE3 AS FLOAT))as [LC/MNF]
+	into	M02_sum
+	FROM	M02
+	group by 
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1
+
+
+	SELECT     
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1 AS PERIOD, 
+			sum(cast(COLUMN_VALUE1 as float))as [LEU/MNF], 
+			sum(CAST(COLUMN_VALUE2 AS FLOAT))as [EUR/MNF]
+	into	M03_sum
+	FROM	M03
+	group by 
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1
+
+	SELECT     
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1 AS PERIOD, 
+			sum(cast(COLUMN_VALUE1 as float))as [LCD/TRD], 
+			sum(CAST(COLUMN_VALUE2 AS FLOAT))as [USD/TRD],
+			sum(CAST(COLUMN_VALUE3 AS FLOAT))as [LC/TRD]
+	into	M04_sum
+	FROM	M04
+	group by 
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1
+
+	SELECT     
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1 AS PERIOD, 
+			sum(cast(COLUMN_VALUE1 as float))as [LEU/TRD], 
+			sum(CAST(COLUMN_VALUE2 AS FLOAT))as [EUR/TRD]
+	into	M05_sum
+	FROM	M05
+	group by 
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1
+
+	SELECT     
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1 AS PERIOD, 
+			sum(cast(COLUMN_VALUE1 as float))as [LCD/PUB], 
+			sum(CAST(COLUMN_VALUE2 AS FLOAT))as [USD/PUB],
+			sum(CAST(COLUMN_VALUE3 AS FLOAT))as [LC/PUB]
+	into	M06_sum
+	FROM	M06
+	group by 
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1
+
+	SELECT     
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1 AS PERIOD, 
+			sum(cast(COLUMN_VALUE1 as float))as [LEU/PUB], 
+			sum(CAST(COLUMN_VALUE2 AS FLOAT))as [EUR/PUB]
+	into	M07_sum
+	FROM	M07
+	group by 
+			CTY, CRP, MNF, ATC4, INTPRD, PRD, NFC123, [STR], INTSTR, INTPCK, PCK, SALT, MOL, COLUMN_NAME1
+
+	UPDATE M01_sum
+	SET PERIOD = REPLACE(PERIOD,'SU MTH','01'),
+		INTSTR = right(INTSTR, len(INTSTR)-8),
+		INTPCK = right(INTPCK, len(INTPCK)-8)
+
+	UPDATE M02_sum
+	SET PERIOD = REPLACE(PERIOD,'LCD/MNF MTH','01'),
+		INTSTR = right(INTSTR, len(INTSTR)-8),
+		INTPCK = right(INTPCK, len(INTPCK)-8)
+
+	UPDATE M03_sum
+	SET PERIOD = REPLACE(PERIOD,'LEU/MNF MTH','01'),
+		INTSTR = right(INTSTR, len(INTSTR)-8),
+		INTPCK = right(INTPCK, len(INTPCK)-8)
+
+	UPDATE M04_sum
+	SET PERIOD = REPLACE(PERIOD,'LCD/TRD MTH','01'),
+		INTSTR = right(INTSTR, len(INTSTR)-8),
+		INTPCK = right(INTPCK, len(INTPCK)-8)
+
+	UPDATE M05_sum
+	SET PERIOD = REPLACE(PERIOD,'LEU/TRD MTH','01'),
+		INTSTR = right(INTSTR, len(INTSTR)-8),
+		INTPCK = right(INTPCK, len(INTPCK)-8)
+
+	UPDATE M06_sum
+	SET PERIOD = REPLACE(PERIOD,'LCD/PUB MTH','01'),
+		INTSTR = right(INTSTR, len(INTSTR)-8),
+		INTPCK = right(INTPCK, len(INTPCK)-8)
+
+	UPDATE M07_sum
+	SET PERIOD = REPLACE(PERIOD,'LEU/PUB MTH','01'),
+		INTSTR = right(INTSTR, len(INTSTR)-8),
+		INTPCK = right(INTPCK, len(INTPCK)-8)
+
+	
+
+	select COUNTRY = M01_SUM.cty,
+		CORPORATION = M01_SUM.crp,
+		MANUFACTURER = M01_SUM.mnf,
+		ATC4 = M01_SUM.atc4,
+		[INTERNATIONAL PRODUCT] = M01_SUM.intprd,
+		PRODUCT = M01_SUM.prd,
+		[NEW FORM CODE 123] = M01_SUM.nfc123,
+		[INTERNATIONAL STRENGTH] = M01_SUM.intstr,
+		[INTERNATIONAL PACK] = M01_SUM.intpck,
+		PACK = M01_SUM.pck,
+		SALT = M01_SUM.salt,
+		MOLECULE = M01_SUM.mol,
+		PERIOD = M01_SUM.PERIOD,
+		[USD/MNF] = convert(numeric(12,0),0),
+		[LEU/PUB] = convert(numeric(12,0),0),
+		[LEU/TRD] = convert(numeric(12,0),0),
+		[LEU/MNF] = convert(numeric(12,0),0),
+		[LCD/PUB] = convert(numeric(12,0),0),
+		[LCD/TRD] = convert(numeric(12,0),0),
+		[LCD/MNF] = convert(numeric(12,0),0),
+		[LC/PUB] = convert(numeric(12,0),0),
+		[LC/TRD] = convert(numeric(12,0),0),
+		[LC/MNF] = convert(numeric(12,0),0),
+		[EUR/PUB] = convert(numeric(12,0),0),
+		[EUR/TRD] = convert(numeric(12,0),0),
+		[EUR/MNF] = convert(numeric(12,0),0),
+		[USD/PUB] = convert(numeric(12,0),0),
+		[USD/TRD] = convert(numeric(12,0),0),
+		[CU] = M01_SUM.[CU],
+		[UN] = M01_SUM.[UN],
+		[SU] = M01_SUM.[SU]
+	into GALDERMA_INTER
+	from M01_SUM
+
+	update GALDERMA_INTER
+	set	GALDERMA_INTER.[USD/MNF] = M02_SUM.[USD/MNF],
+		GALDERMA_INTER.[LCD/MNF] = M02_SUM.[LCD/MNF],
+		GALDERMA_INTER.[LC/MNF] = M02_SUM.[LC/MNF]
+	from M02_SUM
+	where 
+	GALDERMA_INTER.country = M02_SUM.cty
+	and GALDERMA_INTER.CORPORATION = M02_SUM.CRP
+	and GALDERMA_INTER.MANUFACTURER = M02_SUM.MNF
+	and GALDERMA_INTER.ATC4 = M02_SUM.ATC4
+	and GALDERMA_INTER.[INTERNATIONAL PRODUCT] = M02_SUM.INTPRD
+	and GALDERMA_INTER.PRODUCT = M02_SUM.PRD
+	and GALDERMA_INTER.[NEW FORM CODE 123] = M02_SUM.NFC123
+	and GALDERMA_INTER.[INTERNATIONAL STRENGTH] = M02_SUM.INTSTR
+	and GALDERMA_INTER.[INTERNATIONAL PACK] = M02_SUM.INTPCK
+	and GALDERMA_INTER.PACK = M02_SUM.PCK
+	and GALDERMA_INTER.salt = M02_SUM.salt
+	and GALDERMA_INTER.molecule = M02_SUM.mol
+	and GALDERMA_INTER.period = M02_SUM.[PERIOD]
+
+	update GALDERMA_INTER
+	set	GALDERMA_INTER.[leu/mnf] = m03_sum.[LEU/MNF],
+		GALDERMA_INTER.[eur/mnf] = m03_sum.[EUR/MNF]
+	from m03_sum
+	where 
+	GALDERMA_INTER.country = M03_sum.cty
+	and GALDERMA_INTER.CORPORATION = M03_sum.CRP
+	and GALDERMA_INTER.MANUFACTURER = M03_sum.MNF
+	and GALDERMA_INTER.ATC4 = M03_sum.ATC4
+	and GALDERMA_INTER.[INTERNATIONAL PRODUCT] = M03_sum.INTPRD
+	and GALDERMA_INTER.PRODUCT = M03_sum.PRD
+	and GALDERMA_INTER.[NEW FORM CODE 123] = M03_sum.NFC123
+	and GALDERMA_INTER.[INTERNATIONAL STRENGTH] = M03_sum.INTSTR
+	and GALDERMA_INTER.[INTERNATIONAL PACK] = M03_sum.INTPCK
+	and GALDERMA_INTER.PACK = M03_sum.PCK
+	and GALDERMA_INTER.salt = M03_sum.salt
+	and GALDERMA_INTER.molecule = M03_sum.mol
+	and GALDERMA_INTER.period = M03_sum.[PERIOD]
+
+
+	update GALDERMA_INTER
+	set	GALDERMA_INTER.[lcd/trd] = m04_sum.[LCD/TRD],
+		GALDERMA_INTER.[lc/trd] = m04_sum.[LC/TRD],
+		GALDERMA_INTER.[usd/trd] = m04_sum.[USD/TRD]
+	from m04_sum
+	where 
+	GALDERMA_INTER.country = M04_sum.cty
+	and GALDERMA_INTER.CORPORATION = M04_sum.CRP
+	and GALDERMA_INTER.MANUFACTURER = M04_sum.MNF
+	and GALDERMA_INTER.ATC4 = M04_sum.ATC4
+	and GALDERMA_INTER.[INTERNATIONAL PRODUCT] = M04_sum.INTPRD
+	and GALDERMA_INTER.PRODUCT = M04_sum.PRD
+	and GALDERMA_INTER.[NEW FORM CODE 123] = M04_sum.NFC123
+	and GALDERMA_INTER.[INTERNATIONAL STRENGTH] = M04_sum.INTSTR
+	and GALDERMA_INTER.[INTERNATIONAL PACK] = M04_sum.INTPCK
+	and GALDERMA_INTER.PACK = M04_sum.PCK
+	and GALDERMA_INTER.salt = M04_sum.salt
+	and GALDERMA_INTER.molecule = M04_sum.mol
+	and GALDERMA_INTER.period = M04_sum.[PERIOD]
+
+
+	update GALDERMA_INTER
+	set	GALDERMA_INTER.[leu/trd] = m05_sum.[LEU/TRD],
+		GALDERMA_INTER.[eur/trd] = m05_sum.[EUR/TRD]
+	from m05_sum
+	where 
+	GALDERMA_INTER.country = M05_SUM.cty
+	and GALDERMA_INTER.CORPORATION = M05_SUM.CRP
+	and GALDERMA_INTER.MANUFACTURER = M05_SUM.MNF
+	and GALDERMA_INTER.ATC4 = M05_SUM.ATC4
+	and GALDERMA_INTER.[INTERNATIONAL PRODUCT] = M05_SUM.INTPRD
+	and GALDERMA_INTER.PRODUCT = M05_SUM.PRD
+	and GALDERMA_INTER.[NEW FORM CODE 123] = M05_SUM.NFC123
+	and GALDERMA_INTER.[INTERNATIONAL STRENGTH] = M05_SUM.INTSTR
+	and GALDERMA_INTER.[INTERNATIONAL PACK] = M05_SUM.INTPCK
+	and GALDERMA_INTER.PACK = M05_SUM.PCK
+	and GALDERMA_INTER.salt = M05_SUM.salt
+	and GALDERMA_INTER.molecule = M05_SUM.mol
+	and GALDERMA_INTER.period = M05_SUM.[PERIOD]
+
+
+	update GALDERMA_INTER
+	set	GALDERMA_INTER.[lcd/pub] = m06_sum.[LCD/PUB],
+		GALDERMA_INTER.[lc/pub] = m06_sum.[LC/PUB],
+		GALDERMA_INTER.[usd/pub] = m06_sum.[USD/PUB]
+	from m06_sum
+	WHERE
+	GALDERMA_INTER.country = M06_SUM.cty
+	and GALDERMA_INTER.CORPORATION = M06_SUM.CRP
+	and GALDERMA_INTER.MANUFACTURER = M06_SUM.MNF
+	and GALDERMA_INTER.ATC4 = M06_SUM.ATC4
+	and GALDERMA_INTER.[INTERNATIONAL PRODUCT] = M06_SUM.INTPRD
+	and GALDERMA_INTER.PRODUCT = M06_SUM.PRD
+	and GALDERMA_INTER.[NEW FORM CODE 123] = M06_SUM.NFC123
+	and GALDERMA_INTER.[INTERNATIONAL STRENGTH] = M06_SUM.INTSTR
+	and GALDERMA_INTER.[INTERNATIONAL PACK] = M06_SUM.INTPCK
+	and GALDERMA_INTER.PACK = M06_SUM.PCK
+	and GALDERMA_INTER.salt = M06_SUM.salt
+	and GALDERMA_INTER.molecule = M06_SUM.mol
+	and GALDERMA_INTER.period = M06_SUM.[PERIOD]
+
+	update GALDERMA_INTER
+	set	GALDERMA_INTER.[leu/pub] = m07_sum.[LEU/PUB],
+		GALDERMA_INTER.[eur/pub] = m07_sum.[EUR/PUB]
+	from m07_sum
+	WHERE
+	GALDERMA_INTER.country = M07_SUM.cty
+	and GALDERMA_INTER.CORPORATION = M07_SUM.CRP
+	and GALDERMA_INTER.MANUFACTURER = M07_SUM.MNF
+	and GALDERMA_INTER.ATC4 = M07_SUM.ATC4
+	and GALDERMA_INTER.[INTERNATIONAL PRODUCT] = M07_SUM.INTPRD
+	and GALDERMA_INTER.PRODUCT = M07_SUM.PRD
+	and GALDERMA_INTER.[NEW FORM CODE 123] = M07_SUM.NFC123
+	and GALDERMA_INTER.[INTERNATIONAL STRENGTH] = M07_SUM.INTSTR
+	and GALDERMA_INTER.[INTERNATIONAL PACK] = M07_SUM.INTPCK
+	and GALDERMA_INTER.PACK = M07_SUM.PCK
+	and GALDERMA_INTER.salt = M07_SUM.salt
+	and GALDERMA_INTER.molecule = M07_SUM.mol
+	and GALDERMA_INTER.period = M07_SUM.[PERIOD]
+
+	
+	DELETE FROM GALDERMA_INTER
+	WHERE PERIOD LIKE '%MAT%'
+
+	update GALDERMA_INTER
+	set period = 
+			case when (len(ltrim(rtrim(substring(period,4,len(period))))) = 4) then '0' + substring(period,4,len(period))
+					else substring(period,4,len(period))
+			end
+
+	from GALDERMA_INTER
+END
+
+
+
